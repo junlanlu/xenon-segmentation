@@ -166,3 +166,7 @@ datasets/*
 # results
 /results/*
 !/results/**.gitkeep
+
+#tmp
+/tmp/*
+!/tmp/**.gitkeep
