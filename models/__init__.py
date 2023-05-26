@@ -35,7 +35,7 @@ def create_model(config: base_config.Config):
             spatial_dims=3,
             in_channels=config.data.n_channels,
             out_channels=config.data.n_classes,
-            strides=[1, 1, 1],
+            strides=[2, 2, 2],
             channels=[64, 128, 256],
             dropout=0.3,
         )
@@ -81,7 +81,7 @@ def create_model(config: base_config.Config):
             in_channels=config.data.n_channels,
             out_channels=config.data.n_classes,
             kernel_size=(3, 3, 3),
-            strides=(1, 1, 1),
+            strides=(2, 2, 2),
             upsample_kernel_size=(3, 3, 3),
         )
     elif config.model.name == constants.ModelName.RESNET3DVAE:
