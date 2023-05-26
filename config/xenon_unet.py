@@ -56,7 +56,7 @@ class Loss(base_config.Loss):
 
     def __init__(self):
         super().__init__()
-        self.name = constants.LossName.CEDICELOSS
+        self.name = constants.LossName.DICELOSS
         self.weight = torch.tensor([0.1, 1])
 
 
