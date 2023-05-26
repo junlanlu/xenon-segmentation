@@ -197,7 +197,8 @@ class AttentionUnet(BaseModel):
         spatial_dims: number of spatial dimensions of the input image.
         in_channels: number of the input channel.
         out_channels: number of the output classes.
-        channels (Sequence[int]): sequence of channels. Top block first. The length of `channels` should be no less than 2.
+        channels (Sequence[int]): sequence of channels. Top block first. The
+            length of `channels` should be no less than 2.
         strides (Sequence[int]): stride to use for convolutions.
         kernel_size: convolution kernel size.
         up_kernel_size: convolution kernel size for transposed convolution layers.

@@ -17,7 +17,7 @@ from .nnunet import DynUNet
 from .ResNet3D_VAE import ResNet3dVAE
 from .ResNet3DMedNet import generate_resnet3d
 from .SkipDenseNet3D import SkipDenseNet3D
-from .unet_2d import UNet
+from .unet import UNet
 from .unet_3d import UNet3D
 from .unetr import UNETR
 from .vnet import VNet, VNetLight
@@ -35,9 +35,8 @@ def create_model(config: base_config.Config):
             spatial_dims=3,
             in_channels=config.data.n_channels,
             out_channels=config.data.n_classes,
-            strides=[2, 2, 2],
-            channels=[64, 128, 256],
-            dropout=0.3,
+            channels=[8, 16, 32, 64, 128, 256],
+            strides=[2, 2, 2, 2, 2],
         )
     elif config.model.name == constants.ModelName.CNN:
         model = CNN(config.data.n_classes, "resnet18")
@@ -80,9 +79,22 @@ def create_model(config: base_config.Config):
             spatial_dims=3,
             in_channels=config.data.n_channels,
             out_channels=config.data.n_classes,
-            kernel_size=(3, 3, 3),
-            strides=(2, 2, 2),
-            upsample_kernel_size=(3, 3, 3),
+            kernel_size=[
+                [3, 3, 3],
+                [3, 3, 3],
+                [3, 3, 3],
+                [3, 3, 3],
+                [3, 3, 3],
+                [3, 3, 3],
+            ],
+            strides=[[1, 1, 1], [2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]],
+            upsample_kernel_size=[
+                [2, 2, 2],
+                [2, 2, 2],
+                [2, 2, 2],
+                [2, 2, 2],
+                [2, 2, 2],
+            ],
         )
     elif config.model.name == constants.ModelName.RESNET3DVAE:
         model = ResNet3dVAE(
@@ -104,6 +116,14 @@ def create_model(config: base_config.Config):
             drop_rate=0.1,
             classes=config.data.n_classes,
         )
+    elif config.model.name == constants.ModelName.UNET:
+        model = UNet(
+            spatial_dims=3,
+            in_channels=config.data.n_channels,
+            out_channels=config.data.n_classes,
+            channels=[8, 16, 32, 64, 128, 256],
+            strides=[2, 2, 2, 2, 2],
+        )
     elif config.model.name == constants.ModelName.UNETR:
         model = UNETR(
             in_channels=config.data.n_channels,
@@ -111,8 +131,6 @@ def create_model(config: base_config.Config):
             img_size=config.data.crop_size,
             num_heads=8,
         )
-    elif config.model.name == constants.ModelName.UNET2D:
-        model = UNet(config.data.n_channels, config.data.n_classes)
     elif config.model.name == constants.ModelName.UNET3D:
         model = UNet3D(
             in_channels=config.data.n_channels,

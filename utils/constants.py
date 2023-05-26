@@ -19,6 +19,7 @@ class ModelName(enum.Enum):
     RESNET3DVAE = "resnet3dvae"
     RESNETMED3D = "resnetmed3d"
     SKIPDENSENET3D = "skipdensenet3d"
+    UNET = "unet"
     UNET2D = "unet2d"
     UNET3D = "unet3d"
     UNETR = "unetr"

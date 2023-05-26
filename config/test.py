@@ -70,7 +70,7 @@ class Model(base_config.Model):
     def __init__(self):
         """Initialize the model parameters."""
         super().__init__()
-        self.name = constants.ModelName.ATTENTIONUNET
+        self.name = constants.ModelName.UNET
 
 
 def get_config() -> config_dict.ConfigDict:
