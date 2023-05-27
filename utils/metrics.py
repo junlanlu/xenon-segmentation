@@ -13,6 +13,28 @@ def dice(target: np.ndarray, output: np.ndarray) -> float:
 
 
 def hd95(target, output):
+    """
+    Compute the Hausdorff Distance at 95% (HD95) metric between the target and output segmentation masks.
+
+    HD95 is a measure of the maximum distance between the contours of the two masks,
+    considering the 95th percentile of distances. It provides an estimate of the largest
+    spatial discrepancy between the two masks while accounting for outliers.
+
+    Args:
+        target (np.ndarray): The target segmentation mask of shape (N_classes, H, W, D).
+        output (np.ndarray): The output segmentation mask of shape (N_classes, H, W, D).
+        voxel_spacing (Tuple[float, float, float]): The voxel spacing in millimeters (H, W, D).
+
+    Returns:
+        float: The HD95 distance in millimeters.
+
+    Raises:
+        ValueError: If the target and output masks have different shapes or number of classes.
+
+    Note:
+        The target and output masks should have the same shape and number of classes.
+
+    """
     distances = []
     for i in range(target.shape[0]):
         target_indices = np.argwhere(target[i] > 0)
