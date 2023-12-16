@@ -42,6 +42,7 @@ class DatasetName(enum.Enum):
 
     ISEG2019 = "iseg2019"
     XENONSIMPLE = "xenonsimple"
+    XENONTRACHEA = "xenontrachea"
 
 
 class LossName(enum.Enum):
@@ -75,3 +76,4 @@ class LabelName(object):
 
     ISEG2019 = ["Air", "CSF", "GM", "WM"]
     XENONSIMPLE = ["Background", "Lung"]
+    XENONTRACHEA = ["Background", "Trachea"]

@@ -30,6 +30,8 @@ class TensorboardWriter:
             self.label_names = constants.LabelName.ISEG2019
         elif config.data.name == constants.DatasetName.XENONSIMPLE:
             self.label_names = constants.LabelName.XENONSIMPLE
+        elif config.data.name == constants.DatasetName.XENONTRACHEA:
+            self.label_names = constants.LabelName.XENONTRACHEA
         else:
             raise NotImplementedError
 

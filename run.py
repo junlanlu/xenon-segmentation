@@ -7,8 +7,8 @@ import torch
 from absl import app, flags, logging
 from ml_collections import config_flags
 
+import architectures
 import dataloaders
-import models
 from losses import create_loss
 from trainer import Trainer
 from utils import general, io_utils
@@ -39,7 +39,7 @@ def main(unused_argv):
     criterion = create_loss(config=config)
 
     # get the models
-    model, optimizer = models.create_model(config=config)
+    model, optimizer = architectures.create_model(config=config)
     if config.use_cuda:
         criterion = criterion.cuda()
         model = model.cuda()

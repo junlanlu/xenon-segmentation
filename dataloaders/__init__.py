@@ -10,6 +10,7 @@ from utils import constants
 
 from .iseg2019 import MRIDatasetISEG2019
 from .xenon_simple import XenonSimple
+from .xenon_trachea import XenonTrachea
 
 
 def generate_trainval_datasets(config: base_config.Config, path: str = "datasets"):
@@ -43,6 +44,9 @@ def generate_trainval_datasets(config: base_config.Config, path: str = "datasets
     elif config.data.name == constants.DatasetName.XENONSIMPLE:
         train_loader = XenonSimple(mode=constants.DatasetMode.TRAIN)
         val_loader = XenonSimple(mode=constants.DatasetMode.VALIDATION)
+    elif config.data.name == constants.DatasetName.XENONTRACHEA:
+        train_loader = XenonTrachea(mode=constants.DatasetMode.TRAIN)
+        val_loader = XenonTrachea(mode=constants.DatasetMode.VALIDATION)
     else:
         raise ValueError("Dataset: {} not supported.".format(config.data.name))
 
@@ -60,7 +64,9 @@ def generate_test_datasets(config: base_config.Config):
     params = {"batch_size": 1, "shuffle": True, "num_workers": 2}
 
     if config.data.name == constants.DatasetName.XENONSIMPLE:
-        test_loader = XenonSimple(mode=constants.DatasetMode.TEST, augmentation=True)
+        test_loader = XenonSimple(mode=constants.DatasetMode.TEST, augmentation=False)
+    elif config.data.name == constants.DatasetName.XENONTRACHEA:
+        test_loader = XenonTrachea(mode=constants.DatasetMode.TEST, augmentation=False)
     else:
         raise ValueError("Dataset: {} not supported.".format(config.data.name))
 

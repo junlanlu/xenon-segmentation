@@ -1,11 +1,9 @@
 """Plotting functions for the project."""
 
+import os
 import pdb
 import sys
 from typing import Dict, List, Optional, Tuple
-
-import skimage
-import os
 
 sys.path.append("..")
 import cv2
@@ -13,40 +11,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
-
-from utils import constants, io_utils
 import torchio as tio
 
-
-def _merge_rgb_and_gray(gray_slice: np.ndarray, rgb_slice: np.ndarray) -> np.ndarray:
-    """Combine the gray scale image with the RGB binning via HSV.
-
-    Args:
-        gray_slice (np.ndarray): 2D image slice of grayscale image.
-        rgb_slice (_type_): 3D image slice of the RGB grayscale image of shape
-            (H, W, C)
-
-    Returns:
-        (np.ndarray): merged image slice
-    """
-    # construct RGB version of gray-level ute
-    gray_slice_color = np.dstack((gray_slice, gray_slice, gray_slice))
-    # Convert the input image and color mask to HSV
-    gray_slice_hsv = skimage.color.rgb2hsv(gray_slice_color)
-    rgb_slice_hsv = skimage.color.rgb2hsv(rgb_slice)
-    # Replace the hue and saturation of the original image
-    # with that of the color mask
-    gray_slice_hsv[..., 0] = rgb_slice_hsv[..., 0]
-    gray_slice_hsv[..., 1] = rgb_slice_hsv[..., 1]
-    mask = (
-        (rgb_slice[:, :, 0] == 0)
-        & (rgb_slice[:, :, 1] == 0)
-        & (rgb_slice[:, :, 2] == 0)
-    )
-    mask = ~mask
-    gray_slice_hsv[mask, :] = rgb_slice_hsv[mask, :]
-    colormap = skimage.color.hsv2rgb(gray_slice_hsv)
-    return colormap
+from utils import constants, io_utils
 
 
 def map_grey_to_rgb(image: np.ndarray, cmap: Dict[int, np.ndarray]) -> np.ndarray:
@@ -101,27 +68,6 @@ def get_biggest_island_indices(arr: np.ndarray) -> Tuple[int, int]:
     return index_start, index_end
 
 
-def map_and_overlay_to_rgb(
-    image: np.ndarray, image_background: np.ndarray, cmap: Dict[int, np.ndarray]
-) -> np.ndarray:
-    """Map a greyscale image to a RGB image using a colormap and combine w/ background.
-
-    Args:
-        image (np.ndarray): greyscale image of shape (x, y, z)
-        image_background (np.ndarray): greyscale image of shape (x, y, z)
-        cmap (Dict[int, np.ndarray]): colormap mapping integers to RGB values.
-    Returns:
-        RGB image of shape (x, y, z, 3)
-    """
-    image_rgb = map_grey_to_rgb(image, cmap)
-    image_out = np.zeros((image.shape[0], image.shape[1], image.shape[2], 3))
-    for i in range(0, image.shape[2]):
-        image_out[:, :, i, :] = _merge_rgb_and_gray(
-            image_background[:, :, i], image_rgb[:, :, i, :]
-        )
-    return image_out
-
-
 def get_plot_indices(image: np.ndarray, n_slices: int = 16) -> Tuple[int, int]:
     """Get the indices to plot the image.
 
@@ -144,18 +90,21 @@ def get_plot_indices(image: np.ndarray, n_slices: int = 16) -> Tuple[int, int]:
     return index_start, index_skip
 
 
-def overlay_mask_on_image(image: np.ndarray, mask: np.ndarray) -> np.ndarray:
+def overlay_mask_on_image(
+    image: np.ndarray, mask: np.ndarray, percentile_rescale: float = 100
+) -> np.ndarray:
     """Overlay the border of a binary mask on a greyscale image in red.
 
     Args:
         image (np.ndarray): Greyscale image of shape (x, y, z)
         mask (np.ndarray): Binary mask of shape (x, y, z)
+        percentile_rescale (float, optional): Percentile to rescale the image by.
 
     Returns:
         np.ndarray: Overlaid image of shape (x, y, z, 3)
     """
-    # divide by the maximum value to normalize to [0, 1]
-    image = image / np.max(image)
+    image = image / np.percentile(image[mask.astype(bool)], percentile_rescale)
+    image[image > 1] = 1
 
     def border_mask(mask: np.ndarray) -> np.ndarray:
         mask_dilated = np.zeros_like(mask)
@@ -241,6 +190,54 @@ def plot_montage_color(
     )
     plt.figure()
     plt.imshow(montage, cmap="gray")
+    plt.axis("off")
+    plt.savefig(path, transparent=True, bbox_inches="tight", pad_inches=-0.05, dpi=300)
+    plt.clf()
+    plt.close()
+
+
+def plot_slice_color(image: np.ndarray, path: str, index: int):
+    """Plot a single slice of the image in RGB.
+
+    Assumes the image is of shape (x, y, z, 3) where there are at least n_slices.
+    Otherwise, will plot all slices.
+
+    Args:
+        image (np.ndarray): RGB image to plot of shape (x, y, z, 3).
+        path (str): path to save the image.
+        index (int): index to plot.
+    """
+    # plot the montage
+    plt.figure()
+    plt.imshow(image[:, :, index, :], cmap="gray")
+    plt.axis("off")
+    plt.savefig(path, transparent=True, bbox_inches="tight", pad_inches=-0.05, dpi=300)
+    plt.clf()
+    plt.close()
+
+
+def plot_slice_grey(
+    image: np.ndarray, path: str, index: int, percentile_rescale: float = 100
+):
+    """Plot a montage of the image in RGB.
+
+    Assumes the image is of shape (x, y, z) where there are at least n_slices.
+    Otherwise, will plot all slices.
+
+    Args:
+        image (np.ndarray): gray scale image to plot of shape (x, y, z)
+        path (str): path to save the image.
+        index (int): index to plot.
+        percentile_rescale (float, optional): percentile to rescale the image by.
+    """
+    # divide by the maximum value
+    image = image / np.percentile(image, percentile_rescale)
+    image[image > 1] = 1
+    # stack the image to make it 4D (x, y, z, 3)
+    image = np.stack((image, image, image), axis=-1)
+    # plot the montage
+    plt.figure()
+    plt.imshow(image[:, :, index, :], cmap="gray")
     plt.axis("off")
     plt.savefig(path, transparent=True, bbox_inches="tight", pad_inches=-0.05, dpi=300)
     plt.clf()

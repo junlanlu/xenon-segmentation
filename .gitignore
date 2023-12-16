@@ -170,3 +170,11 @@ datasets/*
 #tmp
 /tmp/*
 !/tmp/**.gitkeep
+
+# archive
+/archive/*
+!/archive/**.gitkeep
+
+# analysis
+/analysis/**
+!/analysis/**.gitkeep

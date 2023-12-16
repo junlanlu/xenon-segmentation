@@ -24,6 +24,19 @@ def import_nii(path: str) -> np.ndarray:
     return nib.load(path).get_fdata()
 
 
+def import_nii_to_input_tensor(path: str) -> torch.Tensor:
+    """Import image as torch tensor ready to be used as input.
+
+    Args:
+        path: str file path of nifti file
+    Returns:
+        np.ndarray loaded from nifti file
+    """
+    x = torch.FloatTensor(import_nii(path).copy()).unsqueeze(0)
+    x = (x - x.min()) / (x.max() - x.min())
+    return x.unsqueeze(0)
+
+
 def make_dirs(path: str):
     """Create a directory if it does not exist.
 

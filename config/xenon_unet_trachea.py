@@ -1,5 +1,6 @@
 """Common settings among multiple config files."""
 
+import os
 import sys
 
 import torch
@@ -40,23 +41,13 @@ class Data(base_config.Data):
         """Initialize the dataset parameters."""
         super().__init__()
         self.augmentation = True
-        self.batch_size = 1
-        self.name = constants.DatasetName.XENONSIMPLE
+        self.batch_size = 4
+        self.name = constants.DatasetName.XENONTRACHEA
         self.n_classes = 2
-        self.n_modalities = 2
         self.n_channels = 1
         self.ckpt_dir = ""
-        self.crop_size = (128, 128, 128)
+        self.crop_size = (32, 32, 32)
         self.normalization_method = "full_volume_mean"
-
-
-class Loss(base_config.Loss):
-    """Define the loss hyperparameters."""
-
-    def __init__(self):
-        super().__init__()
-        self.name = constants.LossName.DICELOSS
-        self.weight = torch.tensor([0.1, 1])
 
 
 class Model(base_config.Model):
@@ -70,6 +61,15 @@ class Model(base_config.Model):
         """Initialize the model parameters."""
         super().__init__()
         self.name = constants.ModelName.UNET3D
+
+
+class Loss(base_config.Loss):
+    """Define the loss hyperparameters."""
+
+    def __init__(self):
+        super().__init__()
+        self.name = constants.LossName.DICELOSS
+        self.weight = torch.tensor([0.1, 1])
 
 
 def get_config() -> config_dict.ConfigDict:

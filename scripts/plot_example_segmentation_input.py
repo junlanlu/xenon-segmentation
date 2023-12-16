@@ -1,0 +1,38 @@
+"""Plot example images of trachea signal and segmentation."""
+import os
+import sys
+
+import numpy as np
+from absl import app, flags
+
+sys.path.append(".")
+from utils import io_utils, plot
+
+DATA_DIR = flags.DEFINE_string(
+    "data_dir", "datasets/xenon/train/009-008/gx", "Path to nifti data."
+)
+
+
+def main(unused_argv):
+    image = io_utils.import_nii(path=DATA_DIR.value + "/gas.nii")
+    mask = io_utils.import_nii(path=DATA_DIR.value + "/mask_trachea.nii")
+    mask[mask == 1] = 0
+    mask[mask == 2] = 1
+    plot.plot_slice_color(
+        image=plot.overlay_mask_on_image(
+            image=image, mask=mask.astype("uint8"), percentile_rescale=90
+        ),
+        path="tmp/png/{}_overlay.png".format(os.path.basename(DATA_DIR.value)),
+        index=55,
+    )
+    image = image / np.percentile(image[mask.astype(bool)], 90)
+    image[image > 1] = 1
+    plot.plot_slice_grey(
+        image=np.abs(image),
+        path="tmp/png/{}_grey.png".format(os.path.basename(DATA_DIR.value)),
+        index=55,
+    )
+
+
+if __name__ == "__main__":
+    app.run(main)
