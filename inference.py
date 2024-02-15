@@ -1,9 +1,9 @@
 """Inference script.
 
 Example usage:
-python inference.py --config config/xenon_vnet_trachea.py --image_file \
+python inference.py --config config/xenon_unet_trachea.py --image_file \
     datasets/xenon/test/006-113_s2/gx/gas.nii --model_dir \
-    results/vnet_checkpoints/10_27_02_10_xenontrachea_/
+    results/unet3d_checkpoints/10_30_17_29_xenontrachea_good/
 """
 
 import glob
