@@ -5,6 +5,7 @@ python inference.py --config config/xenon_vnet_trachea.py --image_file \
     datasets/xenon/test/006-113_s2/gx/gas.nii --model_dir \
     results/vnet_checkpoints/10_27_02_10_xenontrachea_/
 """
+
 import glob
 import logging
 import os
@@ -20,12 +21,18 @@ from tester import Tester
 from utils import general, img_utils, io_utils, metrics
 
 _CONFIG = config_flags.DEFINE_config_file(
-    "config", "config/base_config.py", "config file."
+    "config", "config/xenon_unet_trachea.py", "config file."
 )
 
-MODEL_DIR = flags.DEFINE_string("model_dir", "tmp", "Directory to save model.")
-IMAGE_FILE = flags.DEFINE_string("image_file", "tmp", "Image file to test.")
-CUDA = flags.DEFINE_boolean("use_cuda", True, "Whether to use CUDA.")
+MODEL_DIR = flags.DEFINE_string(
+    "model_dir",
+    "results/unet3d_checkpoints/10_30_17_29_xenontrachea_good/",
+    "Directory to save model.",
+)
+IMAGE_FILE = flags.DEFINE_string(
+    "image_file", None, "Image file to test.", required=True
+)
+CUDA = flags.DEFINE_boolean("use_cuda", False, "Whether to use CUDA.")
 
 
 def main(unused_argv):
